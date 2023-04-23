@@ -1,0 +1,38 @@
+
+#include "my_arduino_lib.h"
+#include "my_fnd_lib.h"
+
+uint16_t cnt = 0;  // unsigned char
+uint16_t t_loop = 0;
+
+struct clk
+{
+    int t_loop;
+    char hour;
+    char min;
+    char sec;
+}time = {0,1,24,30};
+
+
+void setup() {
+    // put your setup code here, to run once:
+    DDRB = 0xff;
+    PORTB = 0xff;
+    DDRD = 0xff;
+    Serial.begin(115200); // 9600
+}
+
+void loop() {
+  
+// 실습3
+ delay(1);
+ t_loop++;
+if(t_loop > 10)
+{
+  t_loop = 0;
+  cnt++;
+  (tg_flag == 0) ? tg_flag = 1 : tg_flag = 0;
+}
+fnd_dis_4(cnt);
+
+}

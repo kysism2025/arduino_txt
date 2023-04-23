@@ -1,0 +1,30 @@
+#include <IRremote.h>
+int RECV_PIN = A0;                          // 아두이노 아날로그 입력 A0
+int LED_pin = 7;                            // LED 연결핀
+ 
+IRrecv irrecv(RECV_PIN);                    // IR리모콘 사용을 위한 클래스 생성 
+decode_results decodedSignal;               // IR리모콘으로부터 받은 데이터
+ 
+void setup() {
+  Serial.begin(9600);
+  irrecv.enableIRIn();                      // 리모콘 수신 시작 
+  pinMode(LED_pin, OUTPUT);
+}
+ 
+void loop() {
+  if (irrecv.decode(&decodedSignal) == true){ // IR 수신값이 있는지 판단.
+      Serial.println(decodedSignal.value);              
+      
+      // 참조 : http://scipia.co.kr/blog/224
+      switch (decodedSignal.value) {
+        case 0xFF6897: // Dec : 16738455  // 리모콘의 0버튼이 눌리면 LED ON
+          digitalWrite(LED_pin, LOW); 
+          break;  
+                                             
+        case 0xFF30CF: // Dec : 16730805  // 리모콘의 1버튼이 눌리면 LED OFF
+          digitalWrite(LED_pin, HIGH); 
+          break; 
+      }
+      irrecv.resume();                    // IR 다음 데이터 수신
+  }  
+} 

@@ -1,0 +1,44 @@
+/*
+   가변 저항 1번 <---> GND
+   가변 저항 2번 <---> 아두이노 A0
+   가변 저항 3번 <---> 3.3V
+   
+   아두이노 AREF <---> 5V 혹은 3.3V를 연결합니다.
+*/
+
+float temperature;  
+int reading;  
+int lm35Pin = A0;
+
+void setup()  
+{
+/*
+    참조URL : https://m.blog.naver.com/PostView.naver?isHttpsRedirect=true&blogId=msyang59&logNo=220837373805
+    analogReference(mode) 
+    1. DEFAULT :  analogReference()함수를 사용하지 않아도 기본적으로 
+                      analogRead() 함수를 사용하면 동작됨
+                      아두이노 보드들에서는 5V, 3.3V 전압을 사용하는 아두이노 보드들은 3.3V를 아날로그 기준전압으로 사용
+
+    2. INTERNAL : 내장 기준전압을 사용한다는 의미
+       - ATmega168, ATmega328MCU : 1.1V  아날로그 기준값
+       - ATmega8MCU : 2.56 V 아날로그 기준값  
+       - 아두이노 메가에서 사용불가!
+    3. INTERNAL1V1(아두이노 메가 보드 전용) : 내장 1.1V 아날로그 기준값
+    4. INTERNAL2V56(아두이노 메가 보드 전용) : 내장 2.56V 아날로그 기준값
+    5. EXTERNAL : AREF핀에 외부전원(★0~5V사이 전압만 사용해야함(short발생가능성으로 인함))을 연결하여 기준전압으로 사용
+
+
+*/
+    analogReference(INTERNAL); // 내장 기준 전압을 사용한다는 의미
+    Serial.begin(9600);
+}
+
+void loop()  
+{
+    reading = analogRead(lm35Pin);
+    temperature = reading / 9.31;
+   // 9.31로 나눈이유 : AVR의 아날로그 입력범위는 1024이고, ADC 참조 전압을 INTERNAL 1.1V를 했기 때문입니다.
+    
+    Serial.println(temperature);
+    delay(1000);
+}

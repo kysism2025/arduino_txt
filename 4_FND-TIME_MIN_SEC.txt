@@ -1,0 +1,64 @@
+
+#include "my_arduino_lib.h"
+#include "my_fnd_lib.h"
+
+uint16_t cnt = 0;  // unsigned char
+uint16_t t_loop = 0;
+
+struct clk
+{
+    int t_loop;
+    char hour;
+    char min;
+    char sec;
+}time = {0,1,24,30};
+
+
+void setup() {
+    // put your setup code here, to run once:
+    DDRB = 0xff;
+    PORTB = 0xff;
+    DDRD = 0xff;
+    Serial.begin(115200); // 9600
+}
+
+void loop() {
+  
+	_delay_ms(1);
+	time.t_loop++;
+	
+	if(time.t_loop > 1000)  // 1sec chk sum
+	{ 
+	      // delay처리 
+	      time.t_loop = 0;
+	      time.sec++;
+	      (tg_flag == 0) ? tg_flag = 1 : tg_flag = 0;
+	 
+	      if(time.sec > 59)     // 1분 체크 
+		  { 
+		     time.sec = 0;
+		     time.min++;    
+		     
+		     if(time.min > 59)  // 1시간 체크 
+		     { 
+		       time.min = 0;
+		       time.hour++;
+		       
+		       if(time.hour > 23) // 24시간 체 
+		        { 
+		          time.hour = 0;
+		        }        
+		     } 
+	      }  
+	} 
+	
+	
+	/* 
+	Serial.println(String("1:") + String((time.min/10) * 1000));
+	Serial.println(String("2:") + String((time.min%10) * 100));
+	Serial.println(String("3:") + String((time.sec/10) * 10));
+	Serial.println(String("4:") + String((time.sec %10)));
+	*/
+	fnd_dis_4(((time.min/10)*1000) + ((time.min%10) * 100) + ((time.sec/10) * 10) + (time.sec %10));
+
+}

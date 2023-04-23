@@ -1,0 +1,113 @@
+// make an array to save Sev Seg pin configuration of numbers
+int num_array[10][8] = {  { 1,1,1,1,1,1,0,0 },    // 0
+                          { 0,1,1,0,0,0,0,0 },    // 1
+                          { 1,1,0,1,1,0,1,0 },    // 2
+                          { 1,1,1,1,0,0,1,0 },    // 3
+                          { 0,1,1,0,0,1,1,0 },    // 4
+                          { 1,0,1,1,0,1,1,0 },    // 5
+                          { 1,0,1,1,1,1,1,0 },    // 6
+                          { 1,1,1,0,0,0,0,0 },    // 7
+                          { 1,1,1,1,1,1,1,0 },    // 8
+                          { 1,1,1,0,0,1,1,0 }};   // 9
+
+long prevMillis = 0; 			      // LED update시간
+int countUpEachMillis = 100;   	// LED 숫자 표시 유지시간
+
+int counter    = 0000;
+int maxCounter = 9999;
+  
+// a,b,c,d,e,f,g,h LED
+int segAtoDPpinouts[8] = {2,3,4,5,6,7,8,9};
+
+// Common핀
+int digit1to4pinouts[4] = {10,11,12,13};
+                                       
+// Function header
+void TurnOffAllSegments(int delayMillis = 0);
+void TurnOnAllSegments(int delayMillis = 0);
+void WriteSegmentArraytoDigit(int *, int);
+
+void setup()
+{
+  // Set pin modes for SSD and DP
+  for (int i=0;i<8;i++)
+    pinMode(segAtoDPpinouts[i],OUTPUT);
+
+  // Set pin modes for digits
+  for (int i=0;i<4;i++)
+    pinMode(digit1to4pinouts[i],OUTPUT);
+
+  TurnOffAllSegments();
+
+  Serial.begin(9600);
+}
+
+void loop() 
+{
+  int digit0 = counter/1000;
+  int digit1 = (counter - digit0*1000)/100;
+  int digit2 = (counter - digit0*1000 - digit1*100)/10;
+  int digit3 = (counter - digit0*1000 - digit1*100 - digit2*10);
+  
+  WriteSegmentArraytoDigit(num_array[digit0],0);
+  delay(5);
+  WriteSegmentArraytoDigit(num_array[digit1],1); 
+  delay(5); 
+  WriteSegmentArraytoDigit(num_array[digit2],2); 
+  delay(5);
+  WriteSegmentArraytoDigit(num_array[digit3],3); 
+  delay(5);
+
+  unsigned long currentMillis = millis();
+  if(currentMillis - prevMillis > countUpEachMillis) 
+  {
+    if (counter == maxCounter)
+      counter = 0;
+    else
+      counter++;
+    
+    prevMillis = currentMillis;
+
+  }
+}
+
+// Go through and set all common pins high and all segments low
+void TurnOffAllSegments(int delayMillis)
+{  
+  for (int i=0; i < 8; i++) 
+  {
+    digitalWrite(segAtoDPpinouts[i], LOW);
+    delay(delayMillis);
+  }
+  
+  for (int i=0; i < 4; i++)
+  {
+    digitalWrite(digit1to4pinouts[i], HIGH);
+    delay(delayMillis);
+  }
+}
+
+// Go through and set all common pins high and all segments low
+void TurnOnAllSegments(int delayMillis)
+{  
+  for (int i=0; i < 4; i++)
+  {
+    digitalWrite(digit1to4pinouts[i], LOW);
+    delay(delayMillis);
+  }
+
+  for (int i=0; i < 8; i++) 
+  {
+    digitalWrite(segAtoDPpinouts[i], HIGH);
+    delay(delayMillis);
+  }
+}
+  
+// This functions writes values to the 7seg pins 
+void WriteSegmentArraytoDigit(int * segmentArray, int digitAddress ) 
+{  
+  TurnOffAllSegments();  
+  digitalWrite(digit1to4pinouts[digitAddress],LOW);
+  for (int i=0; i < 8; i++) 
+    digitalWrite(segAtoDPpinouts[i], segmentArray[i]);
+}

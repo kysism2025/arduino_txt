@@ -1,0 +1,33 @@
+
+#include "my_arduino_lib.h"
+#include "my_fnd_lib.h"
+
+uint16_t cnt = 0;  // unsigned char
+uint16_t t_loop = 0;
+
+struct clk
+{
+  int t_loop;
+  char hour;
+  char min;
+  char sec;
+}time = {0,1,24,30};
+
+
+void setup() {
+  // put your setup code here, to run once:
+  DDRB = 0xff;
+  PORTB = 0xff;
+  DDRD = 0xff;
+  Serial.begin(115200); // 9600
+}
+
+void loop() {
+ 
+	 PORTD = fnd_font[cnt];   // mcu 방식
+	 byte_out(fnd_font[cnt]);  // arduino 방식
+	 cnt++;
+	 if(cnt > 9) cnt = 0;
+	 Serial.println((cnt %10 + 0x30)-48);
+	 delay(500);
+}
